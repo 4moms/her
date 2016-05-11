@@ -22,6 +22,7 @@ module Her
         @metadata = attributes.delete(:_metadata) || {}
         @response_errors = attributes.delete(:_errors) || {}
         @destroyed = attributes.delete(:_destroyed) || false
+        @attributes = HashWithIndifferentAccess.new
 
         attributes = self.class.default_scope.apply_to(attributes)
         assign_attributes(attributes)
@@ -101,7 +102,6 @@ module Her
       #   user.assign_attributes(name: "Lindsay")
       #   user.changes # => { :name => ["Tobias", "Lindsay"] }
       def assign_attributes(new_attributes)
-        @attributes ||= attributes
         # Use setter methods first
         unset_attributes = Her::Model::Attributes.use_setter_methods(self, new_attributes)
 
@@ -113,9 +113,7 @@ module Her
       end
       alias attributes= assign_attributes
 
-      def attributes
-        @attributes ||= HashWithIndifferentAccess.new
-      end
+      attr_reader :attributes
 
       # Handles returning true for the accessible attributes
       #
